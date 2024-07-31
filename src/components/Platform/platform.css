@@ -1,0 +1,27 @@
+.platform-container {
+    text-align: center;
+    margin-top: 20px;
+  }
+  
+  .go-to-login-button {
+    background-color: rgb(8, 85, 249);
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    font-size: 18px;
+    font-weight: 700;
+    margin-top: 20px;
+    cursor: pointer;
+    border-radius: 8px;
+    box-shadow: inset;
+
+  }
+  
+  .go-to-login-button:hover {
+    background-color: #719aec; /* Slightly darker yellow for hover effect */
+  }
+  
+  h1 {
+    margin-bottom: 20px;
+  }
+  
