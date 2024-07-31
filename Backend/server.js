@@ -14,7 +14,7 @@ app.use(express.json());
 
 // Create MySQL connection
 const db = mysql.createConnection({
-  host: 'localhost',
+  host: '122.161.50.196',
   user: 'root',
   password: 'Root@123',  // Ensure the password is correct
   database: 'naf_platform'   // Ensure the database name is correct
