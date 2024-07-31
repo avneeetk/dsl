@@ -5,7 +5,7 @@ const bodyParser = require('body-parser');
 const path = require('path');
 
 const app = express();
-const port = 5001;
+const port = 3306;
 
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
