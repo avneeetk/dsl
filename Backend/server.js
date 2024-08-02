@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-const { mockUsers, mockDSLNumbers } = require('Backend/mockdata.js'); // Import mock data
+const { mockUsers, mockDSLNumbers } = require('./Backend/mockdata.js'); // Import mock data
 
 const app = express();
 const port = process.env.PORT || 5001;
@@ -9,7 +9,21 @@ const port = process.env.PORT || 5001;
 // Middleware
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
-app.use(cors());
+
+// CORS Configuration
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true); // Allow requests with no origin, like curl requests
+    if (origin === 'https://your-frontend-domain.com' || origin === 'http://localhost:3000') { // Specify allowed origins
+      return callback(null, true);
+    }
+    return callback(new Error('Not allowed by CORS'), false);
+  },
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  credentials: true,
+  optionsSuccessStatus: 204,
+  allowedHeaders: ['Content-Type', 'Authorization'],
+}));
 
 // User verification endpoint using mock data
 app.post('/user_verify', (req, res) => {
@@ -17,7 +31,7 @@ app.post('/user_verify', (req, res) => {
   console.log('Received request:', req.body);
 
   const user = mockUsers.find(user => user.username === userId);
-  
+
   if (!user) {
     return res.json({ success: false, message: 'User ID not found' });
   }
