@@ -1,8 +1,8 @@
 const express = require('express');
 const mysql = require('mysql2');
 const cors = require('cors');
-require('dotenv').config(); // Load environment variables from .env file
 const path = require('path');
+require('dotenv').config(); // Load environment variables from .env file
 
 const app = express();
 const port = process.env.PORT || 5001;
@@ -10,17 +10,27 @@ const port = process.env.PORT || 5001;
 // Middleware
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
-app.use(cors());
+
+// CORS Configuration
+const allowedOrigins = process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : ['*'];
+app.use(cors({
+  origin: function (origin, callback) {
+    // Allow requests with no origin, like mobile apps or curl requests
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) === -1) {
+      const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+      return callback(new Error(msg), false);
+    }
+    return callback(null, true);
+  }
+}));
 
 // MySQL connection setup
 const db = mysql.createConnection({
   host: process.env.DB_HOST || 'localhost',
   user: process.env.DB_USER || 'root',
   password: process.env.DB_PASSWORD || 'Root@123',
-  database: process.env.DB_NAME || 'naf_platform',
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0
+  database: process.env.DB_NAME || 'naf_platform'
 });
 
 // Connect to MySQL
@@ -66,8 +76,6 @@ app.post('/api/check-dsl', (req, res) => {
   console.log('Received DSL Number:', dslNumber);
 
   const query = 'SELECT platform FROM dsl_numbers WHERE dsl_Number = ?';
-  console.log('Executing query:', query, 'with value:', dslNumber);
-
   db.query(query, [dslNumber], (err, results) => {
     if (err) {
       console.error('Error querying the database:', err);
