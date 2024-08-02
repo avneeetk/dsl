@@ -1,17 +1,35 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+const express = require('express');
+const fs = require('fs');
+const path = require('path');
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
+const app = express();
+app.use(express.json());
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
+const usersFilePath = path.join(__dirname, 'data', 'users.json');
+
+const getUsers = () => {
+  const data = fs.readFileSync(usersFilePath);
+  return JSON.parse(data);
+};
+
+const saveUsers = (users) => {
+  fs.writeFileSync(usersFilePath, JSON.stringify(users, null, 2));
+};
+
+app.get('/users', (req, res) => {
+  const users = getUsers();
+  res.json(users);
+});
+
+app.post('/users', (req, res) => {
+  const users = getUsers();
+  const newUser = { id: Date.now(), ...req.body };
+  users.push(newUser);
+  saveUsers(users);
+  res.status(201).json(newUser);
+});
+
+const port = process.env.PORT || 3000;
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
+});
