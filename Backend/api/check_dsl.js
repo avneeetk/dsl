@@ -1,5 +1,5 @@
 // api/check_dsl.js
-import { mockDSLNumbers } from '../../Backend/mockData.json';
+import { mockDSLNumbers } from '../mockData.json';
 
 export default function handler(req, res) {
   if (req.method === 'POST') {

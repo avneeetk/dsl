@@ -1,5 +1,5 @@
 // api/user_verify.js
-import { mockUsers } from '../../Backend/mockData.json';
+import { mockUsers } from '../mockData.json';
 
 export default function handler(req, res) {
   if (req.method === 'POST') {
