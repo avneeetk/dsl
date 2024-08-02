@@ -1,29 +1,39 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-const { mockUsers, mockDSLNumbers } = require('./Backend/mockdata.js'); // Import mock data
+const fs = require('fs');
 
 const app = express();
 const port = process.env.PORT || 5001;
 
-// Middleware
+// CORS configuration
+app.use(cors({
+  origin: 'http://localhost:3000', // Allow requests from your frontend's origin
+  methods: ['GET', 'POST'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+}));
+
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
 
-// CORS Configuration
-app.use(cors({
-  origin: (origin, callback) => {
-    if (!origin) return callback(null, true); // Allow requests with no origin, like curl requests
-    if (origin === 'https://your-frontend-domain.com' || origin === 'http://localhost:3000') { // Specify allowed origins
-      return callback(null, true);
-    }
-    return callback(new Error('Not allowed by CORS'), false);
-  },
-  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-  credentials: true,
-  optionsSuccessStatus: 204,
-  allowedHeaders: ['Content-Type', 'Authorization'],
-}));
+// Mock data handling
+let mockUsers = [];
+let mockDSLNumbers = [];
+
+fs.readFile(path.join(__dirname, 'mockData.json'), 'utf8', (err, data) => {
+  if (err) {
+    console.error('Error reading mock data:', err);
+    return;
+  }
+
+  try {
+    const mockData = JSON.parse(data);
+    mockUsers = mockData.mockUsers;
+    mockDSLNumbers = mockData.mockDSLNumbers;
+  } catch (parseErr) {
+    console.error('Error parsing mock data:', parseErr);
+  }
+});
 
 // User verification endpoint using mock data
 app.post('/user_verify', (req, res) => {
@@ -33,13 +43,13 @@ app.post('/user_verify', (req, res) => {
   const user = mockUsers.find(user => user.username === userId);
 
   if (!user) {
-    return res.json({ success: false, message: 'User ID not found' });
+    return res.status(404).json({ success: false, message: 'User ID not found' });
   }
 
   if (user.password === password) {
     return res.json({ success: true });
   } else {
-    return res.json({ success: false, message: 'Incorrect password' });
+    return res.status(401).json({ success: false, message: 'Incorrect password' });
   }
 });
 
