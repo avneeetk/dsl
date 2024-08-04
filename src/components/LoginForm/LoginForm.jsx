@@ -1,5 +1,7 @@
+// LoginForm.jsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { mockDSLNumbers } from '../../mockdata'; // Import mock DSL numbers data
 import { MdRouter } from "react-icons/md";
 import './LoginForm.css';
 import table from '../Asset/table.jpg';
@@ -9,33 +11,23 @@ const LoginForm = () => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     setError(null);
 
-    try {
-      const response = await fetch('http://localhost:5001/api/check-dsl', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ dslNumber })
-      });
+    // Find the DSL number in mock data
+    const entry = mockDSLNumbers.find(dsl => dsl.dsl_number === dslNumber);
 
-      if (!response.ok) {
-        throw new Error('DSL number not found');
-      }
-
-      const result = await response.json();
-      if (result.platform === 'NAF Platform 1') {
+    if (entry) {
+      if (entry.platform === 'NAF Platform 1') {
         navigate('/platform1');
-      } else if (result.platform === 'NAF Platform 2') {
+      } else if (entry.platform === 'NAF Platform 2') {
         navigate('/platform2');
       } else {
-        throw new Error('Unknown platform');
+        setError('Unknown platform');
       }
-    } catch (error) {
-      setError(error.message);
+    } else {
+      setError('DSL number not found');
     }
   };
 

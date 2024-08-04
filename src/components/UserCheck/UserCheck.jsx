@@ -1,41 +1,26 @@
+// UserCheck.jsx
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { mockUsers } from '../../mockdata'; // Import mock users data
 import './UserCheck.css';
 import router from '../Asset/router.jpg';
-import { useNavigate } from 'react-router-dom';
 
 const UserCheck = () => {
   const [userId, setUserId] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = (event) => {
     event.preventDefault();
     console.log("Submitting form with userId:", userId, "password:", password);
 
-    try {
-      const response = await fetch('http://localhost:5001/user_verify', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ userId, password }),
-      });
+    // Find the user in mock data
+    const user = mockUsers.find(u => u.username === userId && u.password === password);
 
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-
-      const result = await response.json();
-      console.log("Response from server:", result);
-
-      if (result.success) {
-        navigate('/login'); // Navigate to the login form
-      } else {
-        alert('Login failed: ' + result.message);
-      }
-    } catch (error) {
-      console.error("Error during form submission:", error);
-      alert('An error occurred. Please try again.');
+    if (user) {
+      navigate('/login'); // Navigate to the login form
+    } else {
+      alert('Login failed: Invalid credentials');
     }
   };
 
@@ -78,3 +63,4 @@ const UserCheck = () => {
 };
 
 export default UserCheck;
+
